@@ -92,3 +92,19 @@ npm run preview    # 预览构建产物
 ## License
 
 MIT
+
+## 部署说明
+
+`main` 分支推送后，GitHub Actions 自动完成构建并部署到 GitHub Pages：
+**https://diaoyunxi.github.io/ground-distance-measure/**
+
+### 沙箱环境推送
+
+受限网络环境下无法直连 GitHub 的 git 协议（443 超时），但 REST API 可用。
+`scripts/upload_via_api.py` 提供了基于 Git Data API 的推送方式：
+
+```bash
+GITHUB_TOKEN=<PAT> python3 scripts/upload_via_api.py
+```
+
+它会为每个文件创建 blob → 组成 tree → 创建 commit → 更新分支引用。
