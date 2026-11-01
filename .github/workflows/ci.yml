@@ -1,0 +1,106 @@
+name: CI
+
+on:
+  push:
+    branches: [main, master]
+    tags: ['v*']
+  pull_request:
+    branches: [main, master]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: 类型检查 · 单元测试 · 构建
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: 检出代码
+        uses: actions/checkout@v4
+
+      - name: 启用 Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: npm
+
+      - name: 安装依赖
+        run: npm ci
+
+      - name: TypeScript 类型检查
+        run: npm run typecheck
+
+      - name: 单元测试
+        run: npm run test
+
+      # 需求：重复测试直到构建成功。
+      # 网络抖动或偶发失败时自动重试，累计最多 5 次。
+      - name: 构建产物（自动重试直至成功）
+        run: |
+          set -euo pipefail
+          MAX_ATTEMPTS=5
+          for attempt in $(seq 1 "$MAX_ATTEMPTS"); do
+            echo "::group::构建尝试 ${attempt}/${MAX_ATTEMPTS}"
+            if npm run build; then
+              echo "::endgroup::"
+              echo "构建成功（第 ${attempt} 次尝试）"
+              exit 0
+            fi
+            echo "::endgroup::"
+            if [ "$attempt" -eq "$MAX_ATTEMPTS" ]; then
+              echo "构建在 ${MAX_ATTEMPTS} 次尝试后仍失败" >&2
+              exit 1
+            fi
+            echo "构建失败，10 秒后重试…"
+            sleep 10
+          done
+
+      - name: 上传构建产物
+        uses: actions/upload-artifact@v4
+        with:
+          name: dist
+          path: dist/
+          retention-days: 14
+
+  pages:
+    name: 部署到 GitHub Pages
+    needs: build
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
+
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
+    steps:
+      - name: 检出代码
+        uses: actions/checkout@v4
+
+      - name: 配置 Pages
+        uses: actions/configure-pages@v5
+
+      - name: 构建
+        run: |
+          npm ci
+          npm run build
+
+      - name: 上传 Pages 产物
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist/
+
+      - name: 部署
+        id: deployment
+        uses: actions/deploy-pages@v4

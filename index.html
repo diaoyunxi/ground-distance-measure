@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover"
+    />
+    <meta name="theme-color" content="#0b1220" />
+    <link rel="manifest" href="./manifest.webmanifest" />
+    <link rel="icon" href="./icon.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="./icon.svg" />
+    <meta name="description" content="手机多焦距摄像头地面测距：标定单位距离，实时计算距起点距离，输出起止点直线距离与摄像头移动曲线里程" />
+    <title>地面测距仪 · 多焦距摄像头</title>
+  </head>
+  <body>
+    <div class="app">
+      <header class="topbar">
+        <div class="brand">
+          <span class="logo">📐</span>
+          <div>
+            <h1>地面测距仪</h1>
+            <p class="sub">多焦距摄像头 · 实时地面测距</p>
+          </div>
+        </div>
+
+        <div class="device-block">
+          <label class="field">
+            <span>摄像头</span>
+            <select id="device-select"></select>
+          </label>
+          <label class="field zoom-field">
+            <span>变焦 <b id="zoom-value">1×</b></span>
+            <input id="zoom-slider" type="range" min="1" max="1" step="0.1" value="1" />
+          </label>
+        </div>
+      </header>
+
+      <div id="device-info" class="device-info"></div>
+
+      <main class="stage">
+        <div class="viewport">
+          <video id="video" playsinline muted autoplay></video>
+          <canvas id="canvas"></canvas>
+          <canvas id="overlay"></canvas>
+        </div>
+
+        <aside class="side">
+          <section class="card">
+            <h2>标定</h2>
+            <p class="desc">在地面平放参考物（默认 A4 纸），点击「开始标定」后依次点选 4 个角。</p>
+            <label class="field">
+              <span>参考物</span>
+              <select id="reference-select"></select>
+            </label>
+            <div class="btn-row">
+              <button id="calibrate-btn" class="primary">开始标定</button>
+              <button id="reset-btn" class="ghost">重置</button>
+            </div>
+            <div id="calib-panel" class="hidden">
+              <h3>标定结果</h3>
+              <div id="calib-detail" class="metrics"></div>
+            </div>
+          </section>
+
+          <section class="card">
+            <h2>实时测量</h2>
+            <div class="readout">
+              <div class="readout-item">
+                <span>距起点</span>
+                <b id="live-distance">--</b>
+              </div>
+              <div class="readout-item">
+                <span>曲线里程</span>
+                <b id="live-curve">--</b>
+              </div>
+              <div class="readout-item">
+                <span>单位距离</span>
+                <b id="live-scale">--</b>
+              </div>
+            </div>
+            <p class="desc small" id="live-track">跟踪中…</p>
+            <div class="btn-row">
+              <button id="start-btn" class="primary">开始移动测量</button>
+              <button id="end-btn" class="ghost">标记终点</button>
+            </div>
+          </section>
+
+          <section class="card" id="result-panel">
+            <h2>测量结果</h2>
+            <div class="result-grid">
+              <div class="result-item">
+                <span>起止点直线距离</span>
+                <b id="result-straight">--</b>
+              </div>
+              <div class="result-item">
+                <span>摄像头曲线距离</span>
+                <b id="result-curve">--</b>
+              </div>
+            </div>
+            <div id="result-detail" class="metrics"></div>
+            <div class="btn-row">
+              <button id="copy-btn" class="primary">复制报告</button>
+            </div>
+          </section>
+        </aside>
+      </main>
+
+      <div id="hint" class="hint">请先放置参考物并点击「开始标定」</div>
+      <footer class="statusbar">
+        <span id="status">正在初始化…</span>
+      </footer>
+    </div>
+
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>

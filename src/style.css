@@ -1,0 +1,429 @@
+:root {
+  --bg: #0b1220;
+  --bg-soft: #131c2e;
+  --card: #172136;
+  --card-border: #243149;
+  --text: #e6edf7;
+  --text-dim: #8fa0bd;
+  --accent: #38bdf8;
+  --accent-strong: #0ea5e9;
+  --good: #22c55e;
+  --warn: #f59e0b;
+  --bad: #ef4444;
+  --radius: 14px;
+  --shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+}
+
+* {
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC',
+    'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+  overscroll-behavior: none;
+}
+
+.app {
+  display: flex;
+  flex-direction: column;
+  height: 100dvh;
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 12px;
+  gap: 12px;
+  /* 整体不滚动：视频视口必须始终可见，
+     否则操作侧栏按钮时页面滚动会导致画面移出屏幕、无法继续点选 */
+  overflow: hidden;
+}
+
+/* ---------- 顶栏 ---------- */
+.topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.logo {
+  font-size: 30px;
+  line-height: 1;
+  filter: drop-shadow(0 3px 8px rgba(56, 189, 248, 0.35));
+}
+
+.brand h1 {
+  margin: 0;
+  font-size: 19px;
+  font-weight: 650;
+  letter-spacing: 0.3px;
+}
+
+.sub {
+  margin: 2px 0 0;
+  font-size: 12px;
+  color: var(--text-dim);
+}
+
+.device-block {
+  display: flex;
+  align-items: flex-end;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  font-size: 12px;
+  color: var(--text-dim);
+}
+
+.field > span {
+  letter-spacing: 0.4px;
+}
+
+.zoom-field {
+  min-width: 130px;
+}
+
+select,
+input[type='range'] {
+  background: var(--bg-soft);
+  color: var(--text);
+  border: 1px solid var(--card-border);
+  border-radius: 10px;
+  padding: 8px 10px;
+  font-size: 13px;
+  font-family: inherit;
+  outline: none;
+}
+
+select {
+  min-width: 190px;
+  max-width: 320px;
+}
+
+select:focus-visible,
+input:focus-visible {
+  border-color: var(--accent);
+}
+
+input[type='range'] {
+  padding: 0;
+  height: 34px;
+  accent-color: var(--accent);
+}
+
+.device-info {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.chip {
+  background: var(--bg-soft);
+  border: 1px solid var(--card-border);
+  border-radius: 999px;
+  padding: 4px 11px;
+  font-size: 12px;
+  color: var(--text-dim);
+}
+
+/* ---------- 主区域 ---------- */
+.stage {
+  display: grid;
+  grid-template-columns: 1fr 340px;
+  gap: 14px;
+  align-items: start;
+  /* 占满剩余高度，且可收缩，避免把页面撑出滚动 */
+  flex: 1;
+  min-height: 0;
+}
+
+.viewport {
+  position: relative;
+  background: #000;
+  border-radius: var(--radius);
+  overflow: hidden;
+  border: 1px solid var(--card-border);
+  box-shadow: var(--shadow);
+  /* 高度由 JS 依据视频宽高比设定，保证画布铺满且点击坐标精确 */
+  min-height: 0;
+  width: 100%;
+}
+
+.viewport video,
+.viewport canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.viewport video {
+  /* 用 visibility 而非 display:none，
+     隐藏的视频元素不会加载元数据，videoWidth 会恒为 0 */
+  visibility: hidden;
+}
+
+.viewport canvas {
+  display: block;
+}
+
+/* 叠加层必须位于画面之上，否则会拦截所有点击交互 */
+#overlay {
+  z-index: 2;
+  cursor: crosshair;
+}
+
+#canvas {
+  z-index: 1;
+}
+
+/* ---------- 侧栏卡片 ---------- */
+.side {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  /* 侧栏内容超出时在自身内部滚动，保持视频视口始终可见 */
+  overflow-y: auto;
+  max-height: 100%;
+  padding-right: 2px;
+}
+
+.card {
+  background: var(--card);
+  border: 1px solid var(--card-border);
+  border-radius: var(--radius);
+  padding: 14px;
+}
+
+.card h2 {
+  margin: 0 0 8px;
+  font-size: 15px;
+  font-weight: 620;
+}
+
+.card h3 {
+  margin: 12px 0 8px;
+  font-size: 13px;
+  color: var(--text-dim);
+  font-weight: 600;
+}
+
+.desc {
+  margin: 0 0 12px;
+  font-size: 12.5px;
+  line-height: 1.6;
+  color: var(--text-dim);
+}
+
+.desc.small {
+  font-size: 11.5px;
+  margin: 8px 0 0;
+}
+
+.field + .field {
+  margin-top: 10px;
+}
+
+.btn-row {
+  display: flex;
+  gap: 8px;
+  margin-top: 12px;
+  flex-wrap: wrap;
+}
+
+button {
+  flex: 1;
+  min-width: 110px;
+  border: 1px solid transparent;
+  border-radius: 10px;
+  padding: 11px 14px;
+  font-size: 13.5px;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  transition: transform 0.12s ease, filter 0.12s ease;
+}
+
+button:active {
+  transform: scale(0.98);
+}
+
+button.primary {
+  background: linear-gradient(135deg, var(--accent), var(--accent-strong));
+  color: #06202e;
+}
+
+button.ghost {
+  background: var(--bg-soft);
+  color: var(--text-dim);
+  border-color: var(--card-border);
+}
+
+button:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+/* ---------- 指标 ---------- */
+.metrics {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.metric {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 10px;
+  font-size: 12.5px;
+  padding: 6px 9px;
+  background: var(--bg-soft);
+  border-radius: 8px;
+}
+
+.metric span {
+  color: var(--text-dim);
+}
+
+.metric b {
+  font-variant-numeric: tabular-nums;
+  font-weight: 620;
+}
+
+.q-excellent {
+  color: var(--good);
+}
+.q-good {
+  color: var(--accent);
+}
+.q-fair {
+  color: var(--warn);
+}
+.q-poor {
+  color: var(--bad);
+}
+
+.readout {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+
+.readout-item {
+  background: var(--bg-soft);
+  border-radius: 10px;
+  padding: 10px 8px;
+  text-align: center;
+}
+
+.readout-item span {
+  display: block;
+  font-size: 11px;
+  color: var(--text-dim);
+  margin-bottom: 5px;
+}
+
+.readout-item b {
+  font-size: 15px;
+  font-variant-numeric: tabular-nums;
+  color: var(--accent);
+}
+
+.result-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.result-item {
+  background: linear-gradient(140deg, rgba(56, 189, 248, 0.14), rgba(56, 189, 248, 0.04));
+  border: 1px solid rgba(56, 189, 248, 0.28);
+  border-radius: 10px;
+  padding: 11px 9px;
+  text-align: center;
+}
+
+.result-item span {
+  display: block;
+  font-size: 11px;
+  color: var(--text-dim);
+  margin-bottom: 6px;
+}
+
+.result-item b {
+  font-size: 16px;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ---------- 提示与状态 ---------- */
+.hint {
+  background: var(--bg-soft);
+  border: 1px solid var(--card-border);
+  border-left: 3px solid var(--accent);
+  border-radius: 10px;
+  padding: 11px 14px;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.hint b {
+  color: var(--accent);
+}
+
+.statusbar {
+  font-size: 12px;
+  color: var(--text-dim);
+  padding: 2px 4px 6px;
+}
+
+.hidden {
+  display: none !important;
+}
+
+/* ---------- 响应式 ---------- */
+@media (max-width: 900px) {
+  .stage {
+    grid-template-columns: 1fr;
+    grid-template-rows: minmax(0, auto) minmax(0, 1fr);
+  }
+
+  .topbar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  select {
+    max-width: none;
+    width: 100%;
+  }
+}
+
+@media (max-width: 520px) {
+  .readout {
+    grid-template-columns: 1fr;
+  }
+
+  .result-grid {
+    grid-template-columns: 1fr;
+  }
+}

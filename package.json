@@ -1,0 +1,20 @@
+{
+  "name": "ground-distance-measure",
+  "version": "1.0.0",
+  "private": true,
+  "description": "手机多焦距摄像头地面测距：标定单位距离，实时计算距起点距离，输出起止点直线距离与摄像头移动曲线里程",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc --noEmit && vite build",
+    "preview": "vite preview",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "typescript": "^5.6.3",
+    "vite": "^5.4.11",
+    "vitest": "^2.1.8"
+  }
+}

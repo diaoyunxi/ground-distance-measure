@@ -1,0 +1,19 @@
+{
+  "name": "地面测距仪 · 多焦距摄像头",
+  "short_name": "地面测距",
+  "description": "标定单位距离，实时计算距起点距离，输出起止点直线距离与摄像头移动曲线里程",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#0b1220",
+  "theme_color": "#0b1220",
+  "icons": [
+    {
+      "src": "./icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
