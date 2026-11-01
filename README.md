@@ -82,7 +82,6 @@ npm run preview    # 预览构建产物
 2. 单元测试
 3. 构建 —— **失败自动重试，最多 5 次**，直至构建成功
 4. 上传构建产物（artifact）
-5. `main` 分支额外自动部署到 GitHub Pages
 
 ## 浏览器要求
 
@@ -95,8 +94,8 @@ MIT
 
 ## 部署说明
 
-`main` 分支推送后，GitHub Actions 自动完成构建并部署到 GitHub Pages：
-**https://diaoyunxi.github.io/ground-distance-measure/**
+本项目为纯前端应用，本地 `npm run build` 后可直接部署到任意静态托管。
+仓库的 CI 仅做构建与测试，不含 Pages 部署。
 
 ### 沙箱环境推送
 

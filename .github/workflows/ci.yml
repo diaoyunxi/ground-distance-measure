@@ -68,39 +68,3 @@ jobs:
           name: dist
           path: dist/
           retention-days: 14
-
-  pages:
-    name: 部署到 GitHub Pages
-    needs: build
-    runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
-
-    permissions:
-      contents: read
-      pages: write
-      id-token: write
-
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-
-    steps:
-      - name: 检出代码
-        uses: actions/checkout@v4
-
-      - name: 配置 Pages
-        uses: actions/configure-pages@v5
-
-      - name: 构建
-        run: |
-          npm ci
-          npm run build
-
-      - name: 上传 Pages 产物
-        uses: actions/upload-pages-artifact@v3
-        with:
-          path: dist/
-
-      - name: 部署
-        id: deployment
-        uses: actions/deploy-pages@v4
